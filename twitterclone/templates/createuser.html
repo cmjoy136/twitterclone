@@ -1,0 +1,11 @@
+<h1>Swatter</h1>
+<h2>Links
+    <a href="/"><button>Home</button></a>
+    <a href="/login/"><button>Login</button></a>
+    <a href="/logout/"><button>logout</button></a>
+</h2>
+<form action="" method='post'>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value ="Submit">
+</form>

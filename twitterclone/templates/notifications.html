@@ -1,0 +1,11 @@
+<h1>Notifications</h1>
+
+<a href="/"><button>Home</button></a>
+<a href="/twitteruser/{{ user.twitteruser.id }}"><button>Profile</button></a>
+<a href="/createuser/"><button>Make a User</button></a>
+<a href="/login/"><button>Login</button></a>
+<a href="/logout/"><button>logout</button></a>
+
+{% for notification in notifications %}
+    <li>{{notification}}</li>
+{% endfor %}

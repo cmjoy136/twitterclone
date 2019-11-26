@@ -1,0 +1,8 @@
+<h1>Swatter</h1> 
+<form action="" method='post'>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value ="Submit">
+</form>
+
+<h2><a href="/createuser/"><button>Make a User</button></a></h2>
