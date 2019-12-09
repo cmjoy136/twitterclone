@@ -1,15 +1,20 @@
 from django.shortcuts import render, HttpResponseRedirect, reverse
+from django.views import View
 from django.contrib.auth.models import User
 from twitterclone.twitterusers.models import TwitterUser
 from twitterclone.tweets.models import Tweet
 from twitterclone.twitterusers.forms import TwitterUserForm
 
-def create_user(request):
+class CreateUser(View):
     html = 'createuser.html'
     form = TwitterUserForm()
-    if request.method == 'POST':
-        form = TwitterUserForm(request.POST)
 
+    def get(self, request, *args, **kwargs):
+        form = TwitterUserForm()
+        return render(request, self.html, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = TwitterUserForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
             user= User.objects.create_user(username=data['username'], password=data['password'])
@@ -19,28 +24,31 @@ def create_user(request):
                 bio= data['bio'],
             )
             return HttpResponseRedirect(reverse('homepage'))
-    
-    return render(request, html, {'form': form})
+        return render(request, self.html, {'form': form})
 
-def twitter_user_profile(request, id):
+class TwitterUserProfile(View):
     html = "tweeterprofile.html"
-    twitteruser = TwitterUser.objects.filter(id=id).first()
-    following = twitteruser.follow.count()
-    tweet_count= Tweet.objects.filter(author=twitteruser).count()
-    return render(request, html, {
-        'data': twitteruser,
-        'following':following,
-        'tweet_count': tweet_count
-        })
+    def get(self, request, id, *args, **kwargs):
+        twitteruser= TwitterUser.objects.filter(id=id).first()
+        following = twitteruser.follow.count()
+        tweet_count = Tweet.objects.filter(author=twitteruser).count()
+        return render(request, self.html, {
+            'data': twitteruser,
+            'following':following,
+            'tweet_count': tweet_count
+            })
 
-def follow_twitter_user(request, id):
-    currentuser = request.user.twitteruser
-    twitteruser = TwitterUser.objects.get(id=id)
-    currentuser.follow.add(twitteruser)
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
-def unfollow_twitter_user(request, id):
-    currentuser = request.user.twitteruser
-    twitteruser = TwitterUser.objects.get(id=id)
-    currentuser.follow.remove(twitteruser)
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+class FollowTwitterUser(View):
+    def get(self, request, id, *args, **kwargs):
+        currentuser = request.user.twitteruser
+        twitteruser = TwitterUser.objects.get(id=id)
+        currentuser.follow.add(twitteruser)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+class UnfollowTwitterUser(View):
+    def get(self, request, id, *args, **kwargs):
+        currentuser = request.user.twitteruser
+        twitteruser = TwitterUser.objects.get(id=id)
+        currentuser.follow.remove(twitteruser)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
